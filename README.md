@@ -2,7 +2,7 @@
 
   <img src="https://img.shields.io/badge/Production%20Ready-8B5CF6?style=for-the-badge&logo=rocket&logoColor=white" alt="Production Ready" />
 
-  <h1 style="margin: 12px 0 6px; font-size: 3.4rem;">✨ AITutor</h1>
+  <h1 style="margin: 12px 0 6px; font-size: 3.4rem;">🍇 AI-Tutor 🍇</h1>
   <h3>AI-Powered Tutor for Indian Students</h3>
 
   <p><strong>Enter any topic → Crystal-clear explanation → Ace a smart 10-question mock test grounded in what you just learned</strong></p>
