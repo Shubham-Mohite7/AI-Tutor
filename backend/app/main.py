@@ -45,7 +45,7 @@ app.add_middleware(
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 # ── Routes ────────────────────────────────────────────────────────────────────
-app.include_router(tutor_router, prefix="/api/v1/tutor", tags=["tutor"])
+app.include_router(tutor_router, tags=["tutor"])
 
 
 @app.get("/", tags=["root"])

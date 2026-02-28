@@ -248,17 +248,15 @@ CORRECT: B
         
     except Exception as e:
         logger.error(f"AI generation failed: {e}")
-        # Don't fall back to template - try to return empty so frontend can handle it
-        return LearnResponse(
-            topic=topic,
-            explanation=f"AI generation temporarily unavailable. Please try again in a moment for detailed explanation about {topic}.",
-            quiz=[]
-        )
+        # Use the intelligent fallback system instead of error message
+        return _generate_intelligent_fallback(topic, language)
         
     except Exception as e:
         logger.error(f"Error in generate_learn_response: {e}")
         return LearnResponse(
-            topic=topic,            explanation=f"Information about {topic}"
+            topic=topic,
+            explanation=f"Information about {topic}",
+            quiz=[]
         )
 # ── Adaptive question ──────────────────────────────────────────────────────────
 
@@ -295,7 +293,7 @@ def _generate_dynamic_questions(topic: str) -> list:
     
     # Base question templates that adapt to any topic
     if any(word in topic_lower for word in ["physics", "chemistry", "biology", "science"]):
-        return [
+        question_data = [
             (f"What is the primary focus of {topic}?", 
              [f"A) Understanding fundamental principles and natural laws", "B) Memorizing formulas only", "C) Avoiding laboratory work", "D) Focusing solely on history"]),
             (f"How does {topic} apply to real-world situations?", 
@@ -315,13 +313,11 @@ def _generate_dynamic_questions(topic: str) -> list:
             (f"How does {topic} contribute to technology?", 
              [f"A) By enabling new inventions and innovations", "B) It has no connection", "C) Only through basic research", "D) Only in academic settings"]),
             (f"What is the relationship between theory and experiment in {topic}?", 
-             [f"A) Theory guides experiments, experiments validate theory", "B) They are unrelated", "C) Experiments are more important", "D) Theory is more important"]),
-            (f"What ethical considerations exist in {topic}?", 
-             [f"A) Responsible application and societal impact", "B) No ethical concerns", "C) Only safety regulations", "D) Only environmental issues"])
+             [f"A) Theory guides experiments, experiments validate theory", "B) They are unrelated", "C) Experiments are more important", "D) Theory is more important"])
         ]
     
     elif any(word in topic_lower for word in ["history", "historical", "ancient", "war", "revolution"]):
-        return [
+        question_data = [
             (f"What is the historical significance of {topic}?", 
              [f"A) It shaped modern society and institutions", "B) It's only about dates", "C) It has no relevance today", "D) It's only interesting facts"]),
             (f"How do historians study {topic}?", 
@@ -346,7 +342,7 @@ def _generate_dynamic_questions(topic: str) -> list:
     
     else:
         # General questions for any topic
-        return [
+        question_data = [
             (f"What is the primary focus of {topic}?", 
              [f"A) Understanding its fundamental principles and applications", "B) Memorizing facts only", "C) Avoiding practical examples", "D) Focusing solely on history"]),
             (f"How does {topic} relate to practical situations?", 
@@ -368,6 +364,20 @@ def _generate_dynamic_questions(topic: str) -> list:
             (f"What is the best approach to mastering {topic}?", 
              [f"A) Building understanding through practice and application", "B) Memorizing everything quickly", "C) Focusing only on theory", "D) Avoiding practical examples"])
         ]
+    
+    # Convert to QuizQuestion objects
+    questions = []
+    for i, (question_text, options) in enumerate(question_data):
+        quiz_q = QuizQuestion(
+            question=question_text,
+            options=options,
+            correct_answer=options[0],
+            explanation=f"This answer is correct because it accurately reflects the comprehensive nature of {topic} and its practical applications.",
+            difficulty=i + 1
+        )
+        questions.append(quiz_q)
+    
+    return questions
 
 def _generate_fallback_response(topic: str, language: str) -> LearnResponse:
     """Use the intelligent fallback system instead of AI."""
